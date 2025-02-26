@@ -46,78 +46,24 @@ const Student = sequelize.define(
   }
 );
 
-Student.sync({ alter: true })
-  .then(() => {
-    // return Student.findAll({
-    //   where: {
-    //     [Op.or]: {
-    //       favorite_class: "Computer Science",
-    //       subscribed_to_wittcode: true,
-    //     },
-    //   },
-    // });
-
-    return Student.findAll({
-      attributes: [
-        "school_year",
-        [sequelize.fn("COUNT", sequelize.col("student_id")), "num_students"],
-      ],
-      group: "school_year",
-    });
-  })
-  .then((data) => {
-    data.forEach((el) => {
-      console.log(el.toJSON());
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
 // Student.sync({ alter: true })
 //   .then(() => {
-//     return Student.bulkCreate(
-//       [
-//         {
-//           name: "John",
-//           school_year: 1,
-//           favorite_class: "Computer Science",
-//           subscribed_to_wittcode: false,
-//         },
-//         {
-//           name: "Jane Smith",
-//           school_year: 2,
-//           favorite_class: "Mathematics",
-//           subscribed_to_wittcode: true,
-//         },
-//         {
-//           name: "Michael Lee",
-//           school_year: 3,
-//           favorite_class: "Physics",
-//         },
-//         {
-//           name: "Emily Davis",
-//           school_year: 4,
-//           favorite_class: "Biology",
-//           subscribed_to_wittcode: true,
-//         },
-//         {
-//           name: "Robert Brown",
-//           school_year: 1,
-//           favorite_class: "History",
-//           subscribed_to_wittcode: false,
-//         },
-//         {
-//           name: "Sophia Wilson",
-//           school_year: 2,
-//           favorite_class: "English",
-//           subscribed_to_wittcode: true,
-//         },
+//     // return Student.findAll({
+//     //   where: {
+//     //     [Op.or]: {
+//     //       favorite_class: "Computer Science",
+//     //       subscribed_to_wittcode: true,
+//     //     },
+//     //   },
+//     // });
+
+//     return Student.findAll({
+//       attributes: [
+//         "school_year",
+//         [sequelize.fn("COUNT", sequelize.col("school_year")), "num_students"],
 //       ],
-//       {
-//         validate: true,
-//       }
-//     );
+//       group: "school_year",
+//     });
 //   })
 //   .then((data) => {
 //     data.forEach((el) => {
@@ -127,6 +73,60 @@ Student.sync({ alter: true })
 //   .catch((err) => {
 //     console.log(err);
 //   });
+
+Student.sync({ alter: true })
+  .then(() => {
+    return Student.bulkCreate(
+      [
+        {
+          name: "John",
+          school_year: 1,
+          favorite_class: "Computer Science",
+          subscribed_to_wittcode: false,
+        },
+        {
+          name: "Jane Smith",
+          school_year: 2,
+          favorite_class: "Mathematics",
+          subscribed_to_wittcode: true,
+        },
+        {
+          name: "Michael Lee",
+          school_year: 3,
+          favorite_class: "Physics",
+        },
+        {
+          name: "Emily Davis",
+          school_year: 4,
+          favorite_class: "Biology",
+          subscribed_to_wittcode: true,
+        },
+        {
+          name: "Robert Brown",
+          school_year: 1,
+          favorite_class: "History",
+          subscribed_to_wittcode: false,
+        },
+        {
+          name: "Sophia Wilson",
+          school_year: 2,
+          favorite_class: "English",
+          subscribed_to_wittcode: true,
+        },
+      ],
+      {
+        validate: true,
+      }
+    );
+  })
+  .then((data) => {
+    data.forEach((el) => {
+      console.log(el.toJSON());
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 // Student.sync({ alert: true })
 //   .then(() => {
