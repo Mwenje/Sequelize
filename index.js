@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const bcrypt = require("bcrypt");
 const zlib = require("zlib");
 const { abort } = require("process");
+const { log, error } = require("console");
 
 dotenv.config();
 
@@ -37,22 +38,32 @@ const User = sequelize.define(
       validate: {
         len: [4, 20],
       },
-      get() {
-        const rawValue = this.getDataValue("username");
-        return rawValue.toUpperCase();
-      },
+      // get() {
+      //   const rawValue = this.getDataValue("username");
+      //   return rawValue.toUpperCase();
+      // },
     },
     password: {
       type: DataTypes.STRING,
-      set(value) {
-        const salt = bcrypt.genSaltSync(12);
-        const hash = bcrypt.hashSync(value, salt);
-        this.setDataValue("password", hash);
-      },
+      // set(value) {
+      //   const salt = bcrypt.genSaltSync(12);
+      //   const hash = bcrypt.hashSync(value, salt);
+      //   this.setDataValue("password", hash);
+      // },
     },
     age: {
       type: DataTypes.INTEGER,
       defaultValue: 21,
+      validate: {
+        // isOldEnough(value) {
+        //   if (value < 21) {
+        //     throw new error("Underage");
+        //   }
+        // },
+        isNumeric: {
+          msg: "You must input a number",
+        },
+      },
     },
     codebindRocks: {
       type: DataTypes.BOOLEAN,
@@ -60,32 +71,60 @@ const User = sequelize.define(
     },
     description: {
       type: DataTypes.STRING,
-      set(value) {
-        const compressed = zlib.deflateSync(value).toString("base64");
-        this.setDataValue("description", compressed);
-      },
-      get() {
-        const value = this.getDataValue("description");
-        const uncompressed = zlib.inflateSync(Buffer.from(value, "base64"));
-        return uncompressed.toString();
-      },
+      // set(value) {
+      //   const compressed = zlib.deflateSync(value).toString("base64");
+      //   this.setDataValue("description", compressed);
+      // },
+      // get() {
+      //   const value = this.getDataValue("description");
+      //   const uncompressed = zlib.inflateSync(Buffer.from(value, "base64"));
+      //   return uncompressed.toString();
+      // },
     },
     abortUser: {
       type: DataTypes.VIRTUAL,
-      get() {
-        return `${this.username} ${this.description}`;
+      // get() {
+      //   return `${this.username} ${this.description}`;
+      // },
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true,
+      validate: {
+        myEmailValidator(value) {
+          if (value === null) {
+            throw new Error("Enter an email!");
+          }
+        },
+        // isEmail: true,
+        // isIn: {["sam@gmail.com", "nor@gmail.com"],msg:"input the following"},
       },
     },
   },
   {
     freezeTableName: true,
     timestamps: false,
+    validate: {
+      usernamePassMatch() {
+        if (this.username === this.password) {
+          throw new Error("Password cannot be the username");
+        } else {
+          console.log("user added to the database");
+        }
+      },
+    },
   }
 );
 
 User.sync({ alter: true })
   .then(() => {
-    return User.findOne({ where: { username: "olivia_james22" } });
+    return User.create({
+      username: "zelensky",
+      password: "zelensky",
+    });
+
+    // return User.findOne({ where: { username: "olivia_james22" } });
     // return User.create({
     //   username: "olivia_james22",
     //   age: 22,
@@ -93,14 +132,12 @@ User.sync({ alter: true })
     //   description:
     //     "Olivia is a recent graduate with a degree in finance and a keen interest in traveling.",
     // });
-
     // return User.findAndCountAll({
     //   where: {
     //     username: "john_jones",
     //   },
     //   raw: true,
     // });
-
     // return User.findOrCreate({
     //   where: { username: "john_jones" },
     //   defaults: { password: "123456", age: 25 },
@@ -122,7 +159,9 @@ User.sync({ alter: true })
     // });
   })
   .then((data) => {
-    console.log(data.abortUser);
+    console.log(data.toJSON());
+
+    // console.log(data.abortUser);
 
     //forfindandcountall
     // const { count, rows } = data;
